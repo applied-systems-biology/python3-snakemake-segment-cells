@@ -5,7 +5,7 @@ from scipy import ndimage as ndi
 from skimage import filters
 from skimage import (img_as_ubyte, img_as_float, img_as_int)
 from skimage import io
-from skimage.feature import peak_local_max
+import skimage.morphology as morph
 from skimage.morphology import watershed
 import json
 
@@ -18,7 +18,8 @@ def segment_conidia(input_file, output_file):
     thresholded = mahotas.close_holes(thresholded)
 
     distance = ndi.distance_transform_edt(thresholded)
-    local_maxi = peak_local_max(distance, indices=False, footprint=np.ones((3, 3)), labels=thresholded)
+    local_maxi = distance == morph.dilation(distance, morph.square(3))
+    local_maxi[thresholded == 0] = 0
     markers = ndi.label(local_maxi)[0]
     labels = watershed(-distance, markers, mask=thresholded)
     tifffile.imsave(output_file, img_as_int(labels), compress=5)
