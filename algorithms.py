@@ -32,6 +32,6 @@ def quantify_conidia(label_dir, output_file, experiments):
     data = {}
     for experiment in experiments:
         img = io.imread(label_dir + "/" + experiment + ".tif")
-        data[experiment] = len(np.unique(img))
+        data[experiment] = len(np.unique(img)) - 1
     with open(output_file, "w") as f:
         json.dump(data, f, indent=4)
