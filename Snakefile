@@ -34,29 +34,22 @@ rule all:
     input: expand(config["output"] + "{sample}/results.json", sample=list(samples.keys()))
 
 def aggr_experiments_q(wildcards):
-    return [ config["output"] + wildcards["sample"] + "/filtered/" + x + ".tif" for x in samples[wildcards["sample"]]["experiments"]]
+    return [ config["output"] + wildcards["sample"] + "/" + x + ".tif" for x in samples[wildcards["sample"]]["experiments"]]
 
 rule experiments_q:
     input: aggr_experiments_q
     output: config["output"] + "{sample}/results.json"
     run:
         sample=samples[wildcards["sample"]]
-        conidia=config["output"] + wildcards["sample"] + "/filtered/"
+        conidia=config["output"] + wildcards["sample"] + "/"
         print("Quantifying ...")
         algorithms.quantify_conidia(label_dir=conidia,
                                     output_file=output[0],
                                     experiments=sample["experiments"])
 
-rule filter_conidia:
-    input: config["output"] + "{sample}/segmented/{experiment}.tif"
-    output: config["output"] + "{sample}/filtered/{experiment}.tif"
-    run:
-        sample=samples[wildcards["sample"]]
-        algorithms.filter_conidia(input_file=input[0], output_file=output[0],)
-
 rule segment_conidia:
     input: config["input"] + "{sample}/{experiment}/channel1.tif"
-    output: config["output"] + "{sample}/segmented/{experiment}.tif"
+    output: config["output"] + "{sample}/{experiment}.tif"
     run:
         sample=samples[wildcards["sample"]]
         algorithms.segment_conidia(input_file=input[0], output_file=output[0],)
