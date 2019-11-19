@@ -28,6 +28,25 @@ def segment_conidia(input_file, output_file):
     # tifffile.imsave(output_file + ".vis.tif", img_as_ubyte(color.label2rgb(labels, bg_label=0)), compress=5)
 
 
+def filter_conidia(input_file, output_file):
+    # Maximum area of a conidium
+    min_area = np.pi * 5 ** 2
+    max_area = np.pi * 12 ** 2
+
+    img = io.imread(input_file)
+    keys, counts = np.unique(img, return_counts=True)
+
+    for i in range(len(counts)):
+        key = int(keys[i])
+        count = counts[i]
+        if key > 0:
+            if count < min_area or count > max_area:
+                img[img == key] = 0
+
+    tifffile.imsave(output_file, img_as_int(img), compress=5)
+
+
+
 def quantify_conidia(label_dir, output_file, experiments):
     data = {}
     for experiment in experiments:
