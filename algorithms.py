@@ -24,7 +24,7 @@ def segment_conidia(input_file, output_file):
     local_maxi[thresholded == 0] = 0
     markers = ndi.label(local_maxi)[0]
 
-    labels = watershed(thresholded, markers, mask=thresholded)
+    labels = watershed(-distance, markers, mask=thresholded)
     tifffile.imsave(output_file, img_as_int(labels), compress=5)
     # tifffile.imsave(output_file + ".vis.tif", img_as_ubyte(color.label2rgb(labels, bg_label=0)), compress=5)
 
